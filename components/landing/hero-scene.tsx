@@ -322,12 +322,15 @@ function Phone({
           />
         </>
       ) : null}
-      {/* entrance: the phone drops into place from above */}
+      {/* Entrance: each layer drops into place from above. An ease-out tween
+          (no spring overshoot) plus bottom-first delays keeps every layer above
+          the one beneath it the whole way down, so they never pass through
+          each other. */}
       <motion.div
         className="absolute inset-0"
-        initial={reduce ? false : { z: 280, rotateZ: -10 }}
+        initial={reduce ? false : { z: 320, rotateZ: -8 }}
         animate={{ z: 0, rotateZ: 0 }}
-        transition={{ type: "spring", stiffness: 55, damping: 15, mass: 1.1, delay }}
+        transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1], delay }}
       >
         <motion.div
           className={cx("absolute inset-0", pullOut && out && "pointer-events-auto cursor-pointer")}
@@ -645,10 +648,10 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.15} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
               <NetworkCard />
             </Phone>
-            <Phone geo={PHONE} lift={LIFT.top}>
+            <Phone geo={PHONE} lift={LIFT.top} delay={0.45}>
               <PhoneScreen balance={balance} />
             </Phone>
 
