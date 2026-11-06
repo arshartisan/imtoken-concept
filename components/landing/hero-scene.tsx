@@ -25,11 +25,20 @@ const S = 1000;
 /* Phone footprint on the plane (long axis runs along +x = up-right on screen). */
 type PhoneGeo = { x: number; y: number; w: number; h: number; inset: number; radius: number };
 const PHONE: PhoneGeo = { x: 190, y: 330, w: 620, h: 300, inset: 5, radius: 56 };
-/* Second handset stacked under the main one: same size, sitting lower in Z and
-   nudged toward the viewer's bottom-right so its screen peeks out. */
-const NETWORK_PHONE: PhoneGeo = { x: 150, y: 460, w: 620, h: 300, inset: 5, radius: 56 };
-/* Height of each layer in the stack above the ground (added to the hover). */
-const LIFT = { top: 40, bottom: -46 };
+/* The hero is a three-layer stack: main phone, network phone, blue base card.
+   Every layer repeats the same step — a small shift toward the viewer's
+   bottom-right on the plane plus a fixed drop in Z — so edges stay parallel
+   and the gaps stay even. */
+const STACK_STEP = { dx: -18, dy: 64, dz: 40 };
+const layer = (n: number): PhoneGeo => ({
+  ...PHONE,
+  x: PHONE.x + STACK_STEP.dx * n,
+  y: PHONE.y + STACK_STEP.dy * n,
+});
+const NETWORK_PHONE = layer(1);
+const BASE_CARD = layer(2);
+/* Height of each layer above the ground (added to the shared hover). */
+const LIFT = { top: 28, bottom: 28 - STACK_STEP.dz, base: 28 - STACK_STEP.dz * 2 };
 
 /* Inside the screen we lay out a portrait UI and rotate it 90deg so its top
    points at the notch end. There, "down on screen" is local (+1, +1). */
@@ -549,22 +558,32 @@ export function HeroScene() {
             <Path size={S} d="M860 760 C 860 700, 830 660, 800 640" />
             <Path size={S} d="M110 840 C 170 800, 200 720, 250 660" faint />
 
-            {/* dashed footprint + blue slab the phone floats over */}
+            {/* dashed footprint around the stack's base */}
             <div
               className="absolute rounded-[80px] border-[1.5px] border-dashed border-iso-line opacity-60"
-              style={{ left: 120, top: 470, width: 720, height: 400 }}
+              style={{ left: BASE_CARD.x - 40, top: BASE_CARD.y - 40, width: BASE_CARD.w + 80, height: BASE_CARD.h + 80 }}
             />
+            {/* blue base card: third layer, same footprint and radius as the phones */}
             <div
-              className="absolute rounded-[60px]"
+              className="absolute"
               style={{
-                left: NETWORK_PHONE.x + 30,
-                top: NETWORK_PHONE.y + 70,
-                width: PHONE.w,
-                height: PHONE.h,
-                background: "linear-gradient(90deg, var(--iso-slab-from), var(--iso-slab-to))",
-                boxShadow: `${depth(6, "var(--iso-slab-to)")}`,
+                left: BASE_CARD.x,
+                top: BASE_CARD.y,
+                width: BASE_CARD.w,
+                height: BASE_CARD.h,
+                transform: `translateZ(${LIFT.base}px)`,
               }}
-            />
+            >
+              <div
+                className="phone-hover absolute inset-0"
+                style={{
+                  animationDelay: "-1.2s",
+                  borderRadius: BASE_CARD.radius,
+                  background: "linear-gradient(90deg, var(--iso-slab-from), var(--iso-slab-to))",
+                  boxShadow: `${depth(6, "var(--iso-slab-to)")}, -50px 50px 70px var(--iso-glow)`,
+                }}
+              />
+            </div>
 
             <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6}>
               <NetworkScreen />
