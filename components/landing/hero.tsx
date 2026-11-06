@@ -5,7 +5,7 @@ import { Reveal } from "./reveal";
 
 export function Hero() {
   return (
-    <section className="relative min-h-[980px] overflow-hidden border-b border-landing-frame sm:min-h-[1180px] lg:min-h-[1280px]">
+    <section data-anim className="relative min-h-[980px] overflow-hidden border-b border-landing-frame sm:min-h-[1180px] lg:min-h-[1280px]">
       <HeroScene />
       <div className="relative z-10 mx-auto flex max-w-[980px] flex-col items-center px-4 pt-20 text-center sm:pt-28">
         <Reveal>

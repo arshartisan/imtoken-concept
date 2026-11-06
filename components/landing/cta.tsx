@@ -43,7 +43,7 @@ function Orbit() {
 
 export function Cta() {
   return (
-    <section id="download" className="scroll-mt-20 py-16 sm:py-20">
+    <section id="download" data-anim className="scroll-mt-20 py-16 sm:py-20">
       <div className="relative overflow-hidden border-y border-landing-frame bg-background-primary-default">
         <Orbit />
         <div className="absolute inset-0 bg-gradient-to-r from-background-primary-default via-background-primary-default/85 to-transparent md:via-background-primary-default/60" />

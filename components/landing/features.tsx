@@ -200,7 +200,7 @@ const CARDS = [
 
 export function Features() {
   return (
-    <section id="features" className="scroll-mt-20 border-b border-landing-frame py-24 sm:py-32">
+    <section id="features" data-anim className="scroll-mt-20 border-b border-landing-frame py-24 sm:py-32">
       <div className="mx-auto max-w-[1180px] px-4 sm:px-6">
         <Reveal>
           <h2 className="mx-auto max-w-[760px] text-center font-serif text-section-serif text-landing-ink text-balance">

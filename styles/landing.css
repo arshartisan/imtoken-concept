@@ -140,17 +140,7 @@
   85%, 100% { transform: translateX(120%); }
 }
 
-/* ---------- Stats: flowing line bundles ---------- */
-
-.flow-pulse {
-  stroke-dasharray: 0.07 0.93;
-  animation: flow-pulse 6s linear infinite;
-}
-
-@keyframes flow-pulse {
-  from { stroke-dashoffset: 1; }
-  to { stroke-dashoffset: 0; }
-}
+/* ---------- Stats ---------- */
 
 .text-outline {
   color: transparent;
@@ -409,6 +399,25 @@
   to { transform: translateX(-50%); }
 }
 
+/* ---------- Performance ----------
+ * Sections marked [data-anim] get [data-paused] while off-screen (see
+ * components/landing/offscreen-pause.tsx), freezing their looping animations
+ * so only what's visible costs frames.
+ */
+[data-anim][data-paused],
+[data-anim][data-paused] * {
+  animation-play-state: paused !important;
+}
+
+/* Phones: drop the loops that repaint large areas every frame. */
+@media (max-width: 640px) {
+  .bezel-light,
+  .iso-shadow-pulse,
+  .coin-flip {
+    animation: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .iso-float,
   .iso-dash,
@@ -426,8 +435,7 @@
   .knob-slide,
   .marquee-track,
   .bezel-light,
-  .screen-sheen,
-  .flow-pulse {
+  .screen-sheen {
     animation: none;
   }
 }

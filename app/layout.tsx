@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Instrument_Serif, JetBrains_Mono, Manrope } from "next/font/google";
+import { OffscreenPause } from "@/components/landing/offscreen-pause";
 import { SmoothScroll } from "@/components/landing/smooth-scroll";
 import "@/styles/globals.css";
 
@@ -23,6 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" className={`${manrope.variable} ${instrumentSerif.variable} ${mono.variable} h-full bg-landing-ground antialiased`} suppressHydrationWarning>
       <body className="min-h-full bg-landing-ground font-sans text-text-primary">
         <SmoothScroll>{children}</SmoothScroll>
+        <OffscreenPause />
       </body>
     </html>
   );

@@ -132,6 +132,7 @@ export function FooterScene() {
   return (
     <div
       aria-hidden
+      data-anim
       className="pointer-events-none relative mt-6 h-[420px] overflow-hidden select-none sm:h-[540px] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent,black_18%,black_82%,transparent),linear-gradient(to_bottom,transparent,black_14%,black_88%,transparent)]"
     >
       <div className="absolute left-1/2 top-1/2 h-0 w-0 scale-[0.55] sm:scale-[0.75] lg:scale-[0.9]">

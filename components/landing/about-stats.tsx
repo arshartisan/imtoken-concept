@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useReducedMotion } from "motion/react";
+import { useInView } from "motion/react";
 import { useRef } from "react";
 import { useCountUp } from "@/hooks/use-count-up";
 import { LogoMark } from "./logo";
@@ -13,7 +13,9 @@ const STATS = [
 ];
 
 /* Two bundles of curves sweep in from the top corners and converge below the
-   stats. Each line draws in once, then a short pulse keeps travelling along it. */
+   stats. Drawn once as static paths: animating SVG strokes (draw-in, travelling
+   pulses) repaints the whole section-sized SVG every frame, which made
+   scrolling lag. The bundle only fades in, which the compositor handles. */
 const LINES = 12;
 const W = 1440;
 const H = 640;
@@ -24,15 +26,16 @@ function bundlePath(i: number, mirror: boolean) {
   return `M ${m(x0)} -20 C ${m(x0 + 170)} ${230 + i * 6}, ${m(560 + i * 9)} ${300 + i * 4}, ${m(640 + i * 11)} ${H + 40}`;
 }
 
+const FLOW_PATHS = Array.from({ length: LINES }, (_, i) => [bundlePath(i, false), bundlePath(i, true)]).flat();
+
 function FlowLines({ active }: { active: boolean }) {
-  const reduce = useReducedMotion();
-  const paths = Array.from({ length: LINES }, (_, i) => [bundlePath(i, false), bundlePath(i, true)]).flat();
   return (
     <svg
       aria-hidden
       viewBox={`0 0 ${W} ${H}`}
       preserveAspectRatio="xMidYMid slice"
-      className="pointer-events-none absolute inset-0 size-full [mask-image:linear-gradient(to_bottom,black_55%,transparent)]"
+      className="pointer-events-none absolute inset-0 size-full transition-opacity duration-1000 ease-out"
+      style={{ opacity: active ? 1 : 0 }}
     >
       <defs>
         <linearGradient id="flow-stroke" x1="0" y1="0" x2="0" y2={H} gradientUnits="userSpaceOnUse">
@@ -41,34 +44,16 @@ function FlowLines({ active }: { active: boolean }) {
           <stop offset="1" className="[stop-color:var(--color-accent-600)]" stopOpacity="0" />
         </linearGradient>
       </defs>
-      {paths.map((d, i) => {
-        const lane = Math.floor(i / 2);
-        return (
-          <g key={i}>
-            <motion.path
-              d={d}
-              fill="none"
-              stroke="url(#flow-stroke)"
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
-              style={{ opacity: 0.25 + (lane / LINES) * 0.45 }}
-              initial={reduce ? false : { pathLength: 0 }}
-              animate={active ? { pathLength: 1 } : undefined}
-              transition={{ duration: 2.4, delay: lane * 0.06, ease: [0.22, 1, 0.36, 1] }}
-            />
-            <path
-              d={d}
-              pathLength={1}
-              fill="none"
-              strokeWidth={1.6}
-              strokeLinecap="round"
-              vectorEffect="non-scaling-stroke"
-              className="flow-pulse stroke-accent-300"
-              style={{ animationDelay: `${2.4 + lane * 0.45 + (i % 2) * 1.7}s`, opacity: active ? 0.9 : 0 }}
-            />
-          </g>
-        );
-      })}
+      {FLOW_PATHS.map((d, i) => (
+        <path
+          key={i}
+          d={d}
+          fill="none"
+          stroke="url(#flow-stroke)"
+          strokeWidth={1}
+          opacity={0.25 + (Math.floor(i / 2) / LINES) * 0.45}
+        />
+      ))}
     </svg>
   );
 }
@@ -91,6 +76,7 @@ export function AboutStats() {
   return (
     <section
       ref={ref}
+      data-anim
       aria-labelledby="about-title"
       className="relative overflow-hidden border-b border-landing-frame bg-landing-ground py-24 sm:py-32"
     >

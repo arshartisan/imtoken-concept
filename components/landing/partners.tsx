@@ -68,7 +68,7 @@ function Mark({ name, glyph, className, duplicate }: (typeof PARTNERS)[number] &
 
 export function Partners() {
   return (
-    <section aria-labelledby="partners-title" className="border-b border-landing-frame pt-16 sm:pt-20">
+    <section aria-labelledby="partners-title" data-anim className="border-b border-landing-frame pt-16 sm:pt-20">
       <h2
         id="partners-title"
         className="text-center font-mono text-caption-1-medium tracking-[0.24em] text-text-tertiary uppercase"

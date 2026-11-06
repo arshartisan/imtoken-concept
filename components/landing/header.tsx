@@ -16,7 +16,7 @@ const NAV = [
 export function Header() {
   const [open, setOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-50 border-b border-landing-frame bg-landing-ground/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-landing-frame bg-landing-ground/90 backdrop-blur-sm">
       <div className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between gap-3 px-4 sm:gap-6 sm:px-6">
         <a href="#" aria-label="imToken home" className="rounded-md outline-none focus-visible:ring-2 focus-visible:ring-border-focus-ring">
           <Logo />
