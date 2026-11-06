@@ -285,9 +285,12 @@ function Phone({
   pullOut,
   variant = "phone",
   ready = true,
+  interactive = true,
   children,
 }: {
   geo: PhoneGeo;
+  /** Whether the hover pull-out may respond yet. */
+  interactive?: boolean;
   /** Start the entrance (false until the page has finished loading). */
   ready?: boolean;
   /** "card" drops the handset chrome (bezel, light, glass) for a flat component panel. */
@@ -300,14 +303,15 @@ function Phone({
   children: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
-  const [out, setOut] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const out = hovered && interactive;
   const screenRadius = geo.radius - geo.inset;
   return (
     <div
       className="absolute"
       style={{ left: geo.x, top: geo.y, width: geo.w, height: geo.h, transform: `translateZ(${lift}px)` }}
-      onPointerEnter={pullOut ? (e) => e.pointerType === "mouse" && setOut(true) : undefined}
-      onPointerLeave={pullOut ? (e) => e.pointerType === "mouse" && setOut(false) : undefined}
+      onPointerEnter={pullOut ? (e) => e.pointerType === "mouse" && setHovered(true) : undefined}
+      onPointerLeave={pullOut ? (e) => e.pointerType === "mouse" && setHovered(false) : undefined}
     >
       {/* Hit zones over the edges the layer above leaves exposed. They stay put
           while the phone slides, so the pointer never "loses" it mid-motion. */}
@@ -316,12 +320,12 @@ function Phone({
           <div
             aria-hidden
             className="pointer-events-auto absolute inset-x-0 bottom-0 h-[120px] cursor-pointer"
-            onClick={() => setOut((v) => !v)}
+            onClick={() => setHovered((v) => !v)}
           />
           <div
             aria-hidden
             className="pointer-events-auto absolute inset-y-0 left-0 w-[60px] cursor-pointer"
-            onClick={() => setOut((v) => !v)}
+            onClick={() => setHovered((v) => !v)}
           />
         </>
       ) : null}
@@ -339,7 +343,7 @@ function Phone({
           className={cx("absolute inset-0", pullOut && out && "pointer-events-auto cursor-pointer")}
           animate={pullOut && out ? pullOut : { x: 0, y: 0, z: 0 }}
           transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 140, damping: 20, mass: 0.9 }}
-          onClick={pullOut && out ? () => setOut(false) : undefined}
+          onClick={pullOut && out ? () => setHovered(false) : undefined}
         >
           <div className="phone-hover absolute inset-0" style={{ animationDelay: `${hoverDelay}s` }}>
             {variant === "card" ? (
@@ -604,19 +608,19 @@ function NetworkCard() {
 }
 
 /** Pointer position (−1…1) eased into a small turntable rotation of the scene. */
-function usePointerTilt() {
+function usePointerTilt(armed: boolean) {
   const reduce = useReducedMotion();
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   useEffect(() => {
-    if (reduce) return;
+    if (reduce || !armed) return;
     const onMove = (e: PointerEvent) => {
       px.set((e.clientX / window.innerWidth) * 2 - 1);
       py.set((e.clientY / window.innerHeight) * 2 - 1);
     };
     window.addEventListener("pointermove", onMove, { passive: true });
     return () => window.removeEventListener("pointermove", onMove);
-  }, [reduce, px, py]);
+  }, [reduce, armed, px, py]);
   const spring = { stiffness: 40, damping: 18, mass: 0.8 };
   const rotateZ = useSpring(useTransform(px, [-1, 1], [-3.5, 3.5]), spring);
   const rotateX = useSpring(useTransform(py, [-1, 1], [2.5, -2.5]), spring);
@@ -638,10 +642,36 @@ function usePageLoaded() {
   return loaded;
 }
 
+/**
+ * Pointer-driven motion (tilt, pull-out) stays off until the entrance has
+ * finished AND the visitor genuinely moves the mouse. Otherwise a resting
+ * cursor (or Chrome's synthetic mousemove after layout changes) would nudge
+ * the layers right after they settle, which reads as the entrance replaying.
+ */
+function useSceneArmed(loaded: boolean, entranceMs: number) {
+  const [settled, setSettled] = useState(false);
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!loaded) return;
+    const id = window.setTimeout(() => setSettled(true), entranceMs);
+    return () => window.clearTimeout(id);
+  }, [loaded, entranceMs]);
+  useEffect(() => {
+    if (!settled) return;
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || e.movementX !== 0 || e.movementY !== 0) setArmed(true);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [settled]);
+  return armed;
+}
+
 export function HeroScene() {
   const { balance, event, index } = useWalletFeed();
   const loaded = usePageLoaded();
-  const tilt = usePointerTilt();
+  const armed = useSceneArmed(loaded, 1700);
+  const tilt = usePointerTilt(armed);
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[330px] overflow-hidden select-none sm:top-[300px]">
       <div className="absolute left-1/2 top-[370px] h-0 w-0 sm:top-[490px] lg:top-[545px] scale-[0.5] sm:scale-[0.85] lg:scale-100">
@@ -667,7 +697,7 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} ready={loaded} delay={0.1} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} ready={loaded} delay={0.1} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} interactive={armed} variant="card">
               <NetworkCard />
             </Phone>
             <Phone geo={PHONE} lift={LIFT.top} ready={loaded} delay={0.22}>

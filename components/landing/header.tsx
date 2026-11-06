@@ -36,9 +36,12 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <ThemeToggle appearance="segmented" size="small" />
-          <ButtonLink href="#download" variant="secondary" className="hidden h-11 rounded-full px-5 sm:inline-flex">
-            Download App
-          </ButtonLink>
+          {/* wrapper owns the breakpoint: .button-glow sets its own display */}
+          <span className="hidden sm:inline-flex">
+            <ButtonLink href="#download" variant="glow">
+              Download App
+            </ButtonLink>
+          </span>
           <Button
             variant="ghost"
             iconOnly
