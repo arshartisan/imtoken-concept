@@ -597,7 +597,7 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 40, y: 250, z: 34 }}>
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }}>
               <NetworkScreen />
             </Phone>
             <Phone geo={PHONE} lift={LIFT.top}>
