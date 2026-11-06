@@ -284,9 +284,12 @@ function Phone({
   hoverDelay = 0,
   pullOut,
   variant = "phone",
+  ready = true,
   children,
 }: {
   geo: PhoneGeo;
+  /** Start the entrance (false until the page has finished loading). */
+  ready?: boolean;
   /** "card" drops the handset chrome (bezel, light, glass) for a flat component panel. */
   variant?: "phone" | "card";
   lift?: number;
@@ -322,15 +325,15 @@ function Phone({
           />
         </>
       ) : null}
-      {/* Entrance: each layer drops into place from above. An ease-out tween
-          (no spring overshoot) plus bottom-first delays keeps every layer above
-          the one beneath it the whole way down, so they never pass through
-          each other. */}
+      {/* Entrance: once the page has loaded, the layer rises into place from
+          below the fold (down on screen = −x, +y on the plane) and fades in.
+          It only travels across the plane — its height never changes — so the
+          stacked layers can't pass through each other. */}
       <motion.div
         className="absolute inset-0"
-        initial={reduce ? false : { z: 320, rotateZ: -8 }}
-        animate={{ z: 0, rotateZ: 0 }}
-        transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1], delay }}
+        initial={reduce ? false : { x: -240, y: 240, opacity: 0 }}
+        animate={ready || reduce ? { x: 0, y: 0, opacity: 1 } : undefined}
+        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay }}
       >
         <motion.div
           className={cx("absolute inset-0", pullOut && out && "pointer-events-auto cursor-pointer")}
@@ -620,8 +623,24 @@ function usePointerTilt() {
   return { rotateZ, rotateX };
 }
 
+/** True once the document (fonts, images, scripts) has finished loading. */
+function usePageLoaded() {
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    if (document.readyState === "complete") {
+      setLoaded(true);
+      return;
+    }
+    const onLoad = () => setLoaded(true);
+    window.addEventListener("load", onLoad, { once: true });
+    return () => window.removeEventListener("load", onLoad);
+  }, []);
+  return loaded;
+}
+
 export function HeroScene() {
   const { balance, event, index } = useWalletFeed();
+  const loaded = usePageLoaded();
   const tilt = usePointerTilt();
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 top-[330px] overflow-hidden select-none sm:top-[300px]">
@@ -648,10 +667,10 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.15} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} ready={loaded} delay={0.1} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
               <NetworkCard />
             </Phone>
-            <Phone geo={PHONE} lift={LIFT.top} delay={0.45}>
+            <Phone geo={PHONE} lift={LIFT.top} ready={loaded} delay={0.22}>
               <PhoneScreen balance={balance} />
             </Phone>
 
