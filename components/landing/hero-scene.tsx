@@ -3,13 +3,26 @@
 import {
   RiAddCircleLine,
   RiArrowDownLine,
+  RiArrowDownSLine,
   RiArrowLeftRightLine,
+  RiArrowRightSLine,
   RiArrowUpLine,
   RiBankCardLine,
+  RiBattery2Fill,
   RiCheckboxCircleFill,
+  RiCompass3Line,
+  RiFileCopyLine,
+  RiLineChartLine,
   RiMore2Fill,
-  RiSearchLine,
+  RiQrCodeLine,
+  RiQrScanLine,
+  RiSendPlaneLine,
+  RiSignalWifiFill,
   RiStackLine,
+  RiTimeLine,
+  RiUser3Line,
+  RiVipDiamondLine,
+  RiWallet3Fill,
   type RemixiconComponentType,
 } from "@remixicon/react";
 import { AnimatePresence, motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
@@ -17,7 +30,6 @@ import { useEffect, useState } from "react";
 import { useCountUp } from "@/hooks/use-count-up";
 import { cx } from "@/utils/cx";
 import { depth, Extrude, Ghost, Path, Plane } from "./iso";
-import { LogoMark } from "./logo";
 import { TokenIcon, type TokenSymbol } from "./token-icon";
 
 const S = 1000;
@@ -52,7 +64,7 @@ const EVENTS: ActivityEvent[] = [
   { icon: RiArrowUpLine, label: "Sent", amount: "−0.015 BTC", delta: -96210 },
 ];
 
-const START_BALANCE = 1248052; // cents
+const START_BALANCE = 81122108; // cents, $811,221.08
 
 const usd = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" });
 
@@ -77,71 +89,6 @@ function useWalletFeed() {
 
 /* -------------------------------------------------------------------------- */
 
-function Donut() {
-  const r = 38;
-  const c = 2 * Math.PI * r;
-  const segments = [
-    { share: 0.58, className: "stroke-accent-500" },
-    { share: 0.27, className: "stroke-accent-300" },
-    { share: 0.15, className: "stroke-accent-100" },
-  ];
-  let start = -90;
-  return (
-    <div className="relative size-[108px]" style={{ transform: "translateZ(4px)" }}>
-      {/* extruded body of the ring */}
-      {Array.from({ length: 9 }, (_, i) => (
-        <svg key={i} viewBox="0 0 100 100" className="absolute inset-0" style={{ transform: `translateZ(${i * 2}px)` }}>
-          <circle cx="50" cy="50" r={r} fill="none" strokeWidth="18" className="stroke-accent-700" />
-        </svg>
-      ))}
-      <svg viewBox="0 0 100 100" className="absolute inset-0" style={{ transform: "translateZ(18px)" }}>
-        <circle cx="50" cy="50" r={r} fill="none" strokeWidth="18" className="stroke-iso-face" />
-        {segments.map((s, i) => {
-          const len = s.share * c;
-          const rot = start;
-          start += s.share * 360;
-          return (
-            <circle
-              key={i}
-              cx="50"
-              cy="50"
-              r={r}
-              fill="none"
-              strokeWidth="18"
-              className={cx("donut-draw", s.className)}
-              strokeDasharray={`${len} ${c}`}
-              transform={`rotate(${rot} 50 50)`}
-              style={{ ["--donut-len" as string]: `${len}`, animationDelay: `${i * 0.15}s` }}
-            />
-          );
-        })}
-      </svg>
-    </div>
-  );
-}
-
-function ActivityRow({ symbol, label, value, width, delay }: { symbol: TokenSymbol; label: string; value: string; width: string; delay: number }) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center gap-2">
-        <TokenIcon symbol={symbol} className="size-5" />
-        <span className="text-caption-1-semibold text-text-primary">{label}</span>
-        <span className="ms-auto text-caption-1-medium text-text-tertiary">{value}</span>
-      </div>
-      <div className="h-2 rounded-full bg-accent-50">
-        <div className="bar-grow h-full rounded-full bg-accent-400" style={{ width, animationDelay: `${delay}s` }} />
-      </div>
-    </div>
-  );
-}
-
-const ACTIONS = [
-  { icon: RiArrowUpLine, label: "Send" },
-  { icon: RiArrowDownLine, label: "Receive" },
-  { icon: RiArrowLeftRightLine, label: "Swap" },
-  { icon: RiStackLine, label: "Stake" },
-];
-
 /** Portrait UI inside a landscape screen, rotated so its top meets the notch end. */
 function Portrait({ geo, children }: { geo: PhoneGeo; children: React.ReactNode }) {
   const sw = geo.w - geo.inset * 2; // along +x → the phone's "height"
@@ -156,85 +103,176 @@ function Portrait({ geo, children }: { geo: PhoneGeo; children: React.ReactNode 
   );
 }
 
+const WALLET_ACTIONS = [
+  { icon: RiSendPlaneLine, label: "Transfer" },
+  { icon: RiQrCodeLine, label: "Receive" },
+  { icon: RiTimeLine, label: "Activity" },
+  { icon: RiVipDiamondLine, label: "Stake" },
+];
+
+type WalletToken = {
+  symbol: string;
+  name: string;
+  icon: React.ReactNode;
+  amount: string;
+  value: string;
+  change: string;
+  price: string;
+};
+
+const WALLET_TOKENS: WalletToken[] = [
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    icon: <TokenIcon symbol="ETH" className="size-full" />,
+    amount: "200",
+    value: "$800,000",
+    change: "+1.41%",
+    price: "$4,000.00",
+  },
+  {
+    symbol: "USDT",
+    name: "Tether USD",
+    icon: <TokenIcon symbol="USDT" className="size-full" />,
+    amount: "10,201.08",
+    value: "$10,201.08",
+    change: "+0.01%",
+    price: "$1.00",
+  },
+  {
+    symbol: "LON",
+    name: "Tokenlon",
+    icon: (
+      <span className="grid size-full place-items-center rounded-full bg-iso-dark text-caption-2-bold text-text-white">
+        L
+      </span>
+    ),
+    amount: "1,200",
+    value: "$1,020",
+    change: "+0.84%",
+    price: "$0.85",
+  },
+];
+
+const WALLET_NAV = [
+  { icon: RiWallet3Fill, label: "Wallet", active: true },
+  { icon: RiLineChartLine, label: "Market" },
+  { icon: RiCompass3Line, label: "Browser" },
+  { icon: RiUser3Line, label: "My Profile" },
+];
+
+/* imToken wallet home: account header, raised balance card, actions, token list, tab bar. */
 function PhoneScreen({ balance }: { balance: number }) {
   const shown = useCountUp(balance, balance === START_BALANCE ? 1600 : 700);
   return (
     <Portrait geo={PHONE}>
-      {/* notch */}
-      <div className="absolute top-3 left-1/2 h-6 w-24 -translate-x-1/2 rounded-full bg-iso-hole" />
+      {/* status bar + notch */}
+      <div className="absolute inset-x-5 top-3 flex items-center justify-between text-caption-2-semibold text-text-primary">
+        <span className="tabular-nums">9:41</span>
+        <span className="flex items-center gap-1">
+          <RiSignalWifiFill className="size-3" aria-hidden />
+          <RiBattery2Fill className="size-3.5" aria-hidden />
+        </span>
+      </div>
+      <div className="absolute top-3 left-1/2 h-5 w-20 -translate-x-1/2 rounded-full bg-iso-hole" />
 
-      <div className="absolute inset-x-5 top-12 flex items-center justify-between">
-        <LogoMark className="size-7" />
-        <div className="flex flex-col gap-1">
-          <span className="h-0.5 w-5 rounded-full bg-text-primary" />
-          <span className="h-0.5 w-5 rounded-full bg-text-primary" />
-          <span className="h-0.5 w-3.5 self-end rounded-full bg-text-primary" />
+      {/* account */}
+      <div className="absolute inset-x-4 top-10 flex items-center gap-2">
+        <span className="size-7 rounded-full bg-iso-face-tint p-1">
+          <TokenIcon symbol="ETH" className="size-full" />
+        </span>
+        <span className="flex flex-col">
+          <span className="text-caption-2-medium text-text-tertiary">Wallet 2</span>
+          <span className="flex items-center gap-0.5 text-body-2-semibold text-text-primary">
+            Account 01
+            <RiArrowDownSLine className="size-3.5" aria-hidden />
+          </span>
+        </span>
+        <RiQrScanLine className="ms-auto size-4 text-foreground-icon-primary" aria-hidden />
+      </div>
+
+      {/* raised balance card */}
+      <div className="absolute inset-x-4 top-[84px]" style={{ transform: "translateZ(10px)" }}>
+        <div
+          className="relative overflow-hidden rounded-2xl p-3.5 text-text-white"
+          style={{
+            background: "linear-gradient(135deg, var(--color-accent-400), var(--color-accent-600))",
+            boxShadow: `${depth(5, "var(--color-accent-700)", ...LOCAL_DOWN)}, 18px 18px 26px var(--iso-glow)`,
+          }}
+        >
+          <div className="screen-sheen absolute inset-0" />
+          <p className="relative text-title-2-semibold tabular-nums">{usd.format(shown / 100)}</p>
+          <p className="relative mt-1 flex items-center gap-1 font-mono text-caption-2-medium text-text-white/75">
+            0x3D3B945…5E1A8F8D8
+            <RiFileCopyLine className="size-3" aria-hidden />
+          </p>
+          <span className="relative mt-2.5 inline-flex rounded-md bg-text-white/20 px-2 py-0.5 text-caption-2-semibold">
+            Ethereum
+          </span>
+          <span className="absolute right-3 bottom-3 grid size-5 place-items-center rounded-full bg-text-white text-accent-600">
+            <RiArrowRightSLine className="size-3.5" aria-hidden />
+          </span>
         </div>
       </div>
 
-      {/* balance */}
-      <div className="absolute inset-x-5 top-24">
-        <p className="text-caption-2-semibold tracking-widest text-text-tertiary uppercase">Total balance</p>
-        <p className="mt-1 text-title-1-semibold text-text-primary tabular-nums">{usd.format(shown / 100)}</p>
-        <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-accent-50 px-2 py-0.5 text-caption-2-semibold text-accent-600">
-          <span className="relative flex size-1.5">
-            <span className="live-ping absolute inset-0 rounded-full bg-accent-500" />
-            <span className="relative size-1.5 rounded-full bg-accent-500" />
-          </span>
-          +2.41% today
-        </span>
-      </div>
-
-      {/* quick actions */}
-      <div className="absolute inset-x-5 top-[196px] grid grid-cols-4 gap-2">
-        {ACTIONS.map((a) => (
+      {/* actions */}
+      <div className="absolute inset-x-4 top-[206px] grid grid-cols-4 border-b border-iso-edge pb-2.5">
+        {WALLET_ACTIONS.map((a) => (
           <div key={a.label} className="flex flex-col items-center gap-1">
-            <span className="grid size-10 place-items-center rounded-full bg-accent-500 text-text-white">
-              <a.icon className="size-4" aria-hidden />
-            </span>
-            <span className="text-caption-2-medium text-text-secondary">{a.label}</span>
+            <a.icon className="size-[18px] text-foreground-icon-primary" aria-hidden />
+            <span className="text-caption-2-medium text-text-primary">{a.label}</span>
           </div>
         ))}
       </div>
 
-      {/* raised activity card */}
-      <div className="absolute inset-x-4 top-[270px]" style={{ transform: "translateZ(24px)" }}>
-        <div
-          className="iso-float flex flex-col gap-3 rounded-2xl border border-iso-edge bg-iso-face p-4"
-          style={{
-            boxShadow: `${depth(8, "var(--iso-edge)", ...LOCAL_DOWN)}, 26px 26px 34px var(--iso-glow)`,
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="text-body-2-semibold text-text-primary">Recent activity</span>
-            <span className="text-caption-2-medium text-text-tertiary">Today</span>
+      {/* tabs */}
+      <div className="absolute inset-x-4 top-[262px] flex items-center gap-4">
+        <span className="border-b-2 border-accent-500 pb-1 text-body-2-semibold text-text-primary">Tokens</span>
+        <span className="pb-1.5 text-body-2-medium text-text-tertiary">NFT</span>
+        <span className="pb-1.5 text-body-2-medium text-text-tertiary">DeFi</span>
+        <RiAddCircleLine className="ms-auto size-4 text-foreground-icon-primary" aria-hidden />
+      </div>
+
+      {/* token list */}
+      <div className="absolute inset-x-4 top-[298px] flex flex-col">
+        {WALLET_TOKENS.map((t) => (
+          <div key={t.symbol} className="flex gap-2.5 border-b border-iso-edge py-2.5 last:border-b-0">
+            <span className="size-8 shrink-0">{t.icon}</span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <div className="flex items-start justify-between gap-2">
+                <span className="flex flex-col">
+                  <span className="text-body-2-semibold text-text-primary">{t.symbol}</span>
+                  <span className="text-caption-2-medium text-text-tertiary">{t.name}</span>
+                </span>
+                <span className="flex flex-col items-end">
+                  <span className="text-body-2-semibold text-text-primary tabular-nums">{t.amount}</span>
+                  <span className="text-caption-2-medium text-text-tertiary tabular-nums">{t.value}</span>
+                </span>
+              </div>
+              <div className="flex gap-1.5">
+                <span className="rounded bg-notification-success-background px-1.5 py-0.5 text-caption-2-semibold text-notification-success-foreground tabular-nums">
+                  {t.change}
+                </span>
+                <span className="rounded bg-iso-face-tint px-1.5 py-0.5 text-caption-2-medium text-text-secondary tabular-nums">
+                  {t.price}
+                </span>
+              </div>
+            </div>
           </div>
-          <ActivityRow symbol="ETH" label="Received" value="0.42 ETH" width="78%" delay={0} />
-          <ActivityRow symbol="USDT" label="Swapped" value="500 USDT" width="52%" delay={0.2} />
-        </div>
+        ))}
       </div>
 
-      {/* portfolio card with an extruded donut */}
-      <div className="absolute inset-x-4 top-[430px] flex items-center gap-3 rounded-2xl border border-iso-edge bg-iso-face-tint p-3">
-        <Donut />
-        <div className="flex flex-col gap-2">
-          <span className="text-body-2-semibold text-text-primary">Portfolio</span>
-          {[
-            ["bg-accent-500", "ETH", "58%"],
-            ["bg-accent-300", "BTC", "27%"],
-            ["bg-accent-100", "Other", "15%"],
-          ].map(([dot, k, v]) => (
-            <span key={k} className="flex items-center gap-1.5 text-caption-2-medium text-text-secondary">
-              <span className={cx("size-2 rounded-full", dot)} />
-              {k}
-              <span className="text-text-primary">{v}</span>
+      {/* tab bar */}
+      <div className="absolute inset-x-0 bottom-0 grid grid-cols-4 border-t border-iso-edge px-2 pt-2 pb-4">
+        {WALLET_NAV.map((n) => (
+          <div key={n.label} className="flex flex-col items-center gap-0.5">
+            <n.icon className={cx("size-4", n.active ? "text-accent-500" : "text-foreground-icon-tertiary")} aria-hidden />
+            <span className={cx("text-caption-2-medium", n.active ? "text-accent-600" : "text-text-tertiary")}>
+              {n.label}
             </span>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
-
-      {/* home indicator */}
-      <div className="absolute bottom-3 left-1/2 h-1 w-24 -translate-x-1/2 rounded-full bg-text-primary/80" />
     </Portrait>
   );
 }
@@ -245,9 +283,12 @@ function Phone({
   delay = 0.25,
   hoverDelay = 0,
   pullOut,
+  variant = "phone",
   children,
 }: {
   geo: PhoneGeo;
+  /** "card" drops the handset chrome (bezel, light, glass) for a flat component panel. */
+  variant?: "phone" | "card";
   lift?: number;
   delay?: number;
   hoverDelay?: number;
@@ -295,34 +336,52 @@ function Phone({
           onClick={pullOut && out ? () => setOut(false) : undefined}
         >
           <div className="phone-hover absolute inset-0" style={{ animationDelay: `${hoverDelay}s` }}>
-            {/* slim bezel */}
-            <div
-              className="absolute inset-0 border border-iso-frame-edge"
-              style={{
-                borderRadius: geo.radius,
-                background: "linear-gradient(90deg, var(--iso-frame-from), var(--iso-frame-to))",
-                boxShadow: `${depth(7, "var(--iso-frame-edge)")}, -60px 60px 80px var(--iso-glow)`,
-              }}
-            />
-            {/* travelling light on the bezel ring */}
-            <div
-              className="bezel-light absolute inset-0 opacity-80"
-              style={{ borderRadius: geo.radius, padding: geo.inset, transform: "translateZ(0.5px)" }}
-            />
-            {/* screen */}
-            <div
-              className="absolute border border-iso-edge bg-iso-face"
-              style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(1px)" }}
-            >
-              {children}
-            </div>
-            {/* glass reflection, under the raised card so it reads as the screen surface */}
-            <div
-              className="absolute overflow-hidden"
-              style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(2px)" }}
-            >
-              <div className="screen-sheen absolute inset-0" />
-            </div>
+            {variant === "card" ? (
+              <>
+                {/* flat component panel: hairline outline, a few px of edge, no handset chrome */}
+                <div
+                  className="absolute inset-0 border-[1.5px] border-iso-frame-edge bg-landing-ground"
+                  style={{
+                    borderRadius: geo.radius - 16,
+                    boxShadow: `${depth(4, "var(--iso-edge)")}, -50px 50px 70px var(--iso-glow)`,
+                  }}
+                />
+                <div className="absolute" style={{ inset: geo.inset, transform: "translateZ(1px)" }}>
+                  {children}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* slim bezel */}
+                <div
+                  className="absolute inset-0 border border-iso-frame-edge"
+                  style={{
+                    borderRadius: geo.radius,
+                    background: "linear-gradient(90deg, var(--iso-frame-from), var(--iso-frame-to))",
+                    boxShadow: `${depth(7, "var(--iso-frame-edge)")}, -60px 60px 80px var(--iso-glow)`,
+                  }}
+                />
+                {/* travelling light on the bezel ring */}
+                <div
+                  className="bezel-light absolute inset-0 opacity-80"
+                  style={{ borderRadius: geo.radius, padding: geo.inset, transform: "translateZ(0.5px)" }}
+                />
+                {/* screen */}
+                <div
+                  className="absolute border border-iso-edge bg-iso-face"
+                  style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(1px)" }}
+                >
+                  {children}
+                </div>
+                {/* glass reflection, under the raised card so it reads as the screen surface */}
+                <div
+                  className="absolute overflow-hidden"
+                  style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(2px)" }}
+                >
+                  <div className="screen-sheen absolute inset-0" />
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
       </motion.div>
@@ -385,7 +444,7 @@ function Coin({
 /* Transaction toast that pops off the phone each time the feed ticks. */
 function ActivityToast({ event, index }: { event: ActivityEvent | null; index: number }) {
   return (
-    <div className="absolute" style={{ left: 700, top: 450, transform: "rotate(90deg)" }}>
+    <div className="absolute" style={{ left: 880, top: 400, transform: "rotate(90deg)" }}>
       <AnimatePresence>
         {event ? (
           <motion.div
@@ -511,21 +570,11 @@ function NetworkTile({ net, selected }: { net: Network; selected: boolean }) {
   );
 }
 
-function NetworkScreen() {
+function NetworkCard() {
   const selected = useNetworkCycle();
   return (
     <Portrait geo={NETWORK_PHONE}>
-      <div className="absolute top-3 left-1/2 h-5 w-20 -translate-x-1/2 rounded-full bg-iso-hole" />
-      <div className="absolute inset-x-3.5 top-10 flex items-center justify-between">
-        <span className="text-body-2-semibold text-text-primary">Networks</span>
-        <span className="flex items-center gap-2">
-          <span className="rounded-full bg-accent-50 px-2 py-0.5 text-caption-2-semibold text-accent-600 tabular-nums">
-            {selected.size} selected
-          </span>
-          <RiSearchLine className="size-3.5 text-foreground-icon-tertiary" aria-hidden />
-        </span>
-      </div>
-      <div className="absolute inset-x-3.5 top-[72px] flex flex-col gap-2.5">
+      <div className="absolute inset-x-4 top-5 flex flex-col gap-3">
         {NETWORK_GROUPS.map((g) => (
           <div key={g.label} className="flex flex-col gap-1.5">
             <span className="text-caption-2-medium text-text-tertiary">{g.label}</span>
@@ -536,7 +585,7 @@ function NetworkScreen() {
             </div>
           </div>
         ))}
-        <div className="mt-1 flex items-center gap-2.5 rounded-xl border border-iso-edge bg-iso-face px-3 py-2.5">
+        <div className="mt-2 flex items-center gap-2.5 rounded-xl border border-iso-edge bg-iso-face px-3 py-3">
           <span className="grid size-7 place-items-center rounded-lg bg-accent-50 text-accent-500">
             <RiBankCardLine className="size-4" aria-hidden />
           </span>
@@ -544,7 +593,6 @@ function NetworkScreen() {
           <RiCheckboxCircleFill className="ms-auto size-4 text-accent-500" aria-hidden />
         </div>
       </div>
-      <div className="absolute bottom-2.5 left-1/2 h-1 w-20 -translate-x-1/2 rounded-full bg-text-primary/80" />
     </Portrait>
   );
 }
@@ -597,8 +645,8 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }}>
-              <NetworkScreen />
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 16, y: 100, z: 18 }} variant="card">
+              <NetworkCard />
             </Phone>
             <Phone geo={PHONE} lift={LIFT.top}>
               <PhoneScreen balance={balance} />
