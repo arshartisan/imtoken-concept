@@ -25,8 +25,11 @@ const S = 1000;
 /* Phone footprint on the plane (long axis runs along +x = up-right on screen). */
 type PhoneGeo = { x: number; y: number; w: number; h: number; inset: number; radius: number };
 const PHONE: PhoneGeo = { x: 190, y: 330, w: 620, h: 300, inset: 5, radius: 56 };
-/* Second handset in the open ground below the main phone (down on screen = −x, +y). */
-const NETWORK_PHONE: PhoneGeo = { x: -150, y: 700, w: 560, h: 280, inset: 5, radius: 52 };
+/* Second handset stacked under the main one: same size, sitting lower in Z and
+   nudged toward the viewer's bottom-right so its screen peeks out. */
+const NETWORK_PHONE: PhoneGeo = { x: 150, y: 460, w: 620, h: 300, inset: 5, radius: 56 };
+/* Height of each layer in the stack above the ground (added to the hover). */
+const LIFT = { top: 40, bottom: -46 };
 
 /* Inside the screen we lay out a portrait UI and rotate it 90deg so its top
    points at the notch end. There, "down on screen" is local (+1, +1). */
@@ -230,11 +233,13 @@ function PhoneScreen({ balance }: { balance: number }) {
 
 function Phone({
   geo,
+  lift = 0,
   delay = 0.25,
   hoverDelay = 0,
   children,
 }: {
   geo: PhoneGeo;
+  lift?: number;
   delay?: number;
   hoverDelay?: number;
   children: React.ReactNode;
@@ -242,7 +247,10 @@ function Phone({
   const reduce = useReducedMotion();
   const screenRadius = geo.radius - geo.inset;
   return (
-    <div className="absolute" style={{ left: geo.x, top: geo.y, width: geo.w, height: geo.h }}>
+    <div
+      className="absolute"
+      style={{ left: geo.x, top: geo.y, width: geo.w, height: geo.h, transform: `translateZ(${lift}px)` }}
+    >
       {/* entrance: the phone settles onto its slab from above */}
       <motion.div
         className="absolute inset-0"
@@ -544,13 +552,13 @@ export function HeroScene() {
             {/* dashed footprint + blue slab the phone floats over */}
             <div
               className="absolute rounded-[80px] border-[1.5px] border-dashed border-iso-line opacity-60"
-              style={{ left: 170, top: 350, width: 700, height: 380 }}
+              style={{ left: 120, top: 470, width: 720, height: 400 }}
             />
             <div
               className="absolute rounded-[60px]"
               style={{
-                left: 220,
-                top: 400,
+                left: NETWORK_PHONE.x + 30,
+                top: NETWORK_PHONE.y + 70,
                 width: PHONE.w,
                 height: PHONE.h,
                 background: "linear-gradient(90deg, var(--iso-slab-from), var(--iso-slab-to))",
@@ -558,16 +566,16 @@ export function HeroScene() {
               }}
             />
 
-            <Phone geo={NETWORK_PHONE} delay={0.55} hoverDelay={-2.5}>
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6}>
               <NetworkScreen />
             </Phone>
-            <Phone geo={PHONE}>
+            <Phone geo={PHONE} lift={LIFT.top}>
               <PhoneScreen balance={balance} />
             </Phone>
 
             <Coin x={20} y={210} size={120} front="ETH" back="USDT" z={130} />
             <Coin x={790} y={650} size={130} front="BTC" back="TRX" z={110} delay={1.2} />
-            <Coin x={660} y={880} size={70} front="SOL" back="BNB" z={90} delay={2.4} />
+            <Coin x={820} y={980} size={70} front="SOL" back="BNB" z={90} delay={2.4} />
             <Coin x={900} y={420} size={64} front="DOT" back="ATOM" z={100} delay={3.1} />
 
             <ActivityToast event={event} index={index} />
