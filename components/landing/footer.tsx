@@ -5,8 +5,7 @@ import { NewsletterForm } from "./newsletter-form";
 
 const MENU = [
   { label: "Wallet", href: "#features" },
-  { label: "imKey Pro", href: "#security" },
-  { label: "Security", href: "#security" },
+  { label: "imKey Pro", href: "#features" },
   { label: "FAQ", href: "#faq" },
   { label: "Download", href: "#download" },
 ];

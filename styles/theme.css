@@ -22,27 +22,43 @@
   --color-neutral-925: #121212;
   --color-blue-400:    #3392ff;
 
+  /* ----- Brand ramp ----------------------------------------------------------
+   * imToken primary blue #468bdf at 500; the other steps keep its OKLCH hue
+   * (≈255°) and step lightness/chroma evenly. Accent-* points here.
+   * --------------------------------------------------------------------------*/
+  --color-brand-50:   #edf6ff;
+  --color-brand-100:  #d8eaff;
+  --color-brand-200:  #bcdbff;
+  --color-brand-300:  #91c1fd;
+  --color-brand-400:  #64a1ed;
+  --color-brand-500:  #468bdf;
+  --color-brand-600:  #296dbd;
+  --color-brand-700:  #1d599f;
+  --color-brand-800:  #16467e;
+  --color-brand-900:  #113561;
+  --color-brand-950:  #07203f;
+
   /* ----- Accent ramp ---------------------------------------------------------
    * The CTA hue. Interactive/selection surfaces (primary button gradient,
    * ghost + link buttons, checkbox, radio, switch, slider, tabs, sidebar
    * selected, focus ring, date-range selection) reference accent-* instead of
    * a raw hue, so the whole system re-tints by overriding these eleven
    * variables at runtime (see components/application/theme/accent.ts) or in
-   * a customer project after importing this file. Defaults to the blue
-   * primitives above. Content/data blues (charts, status chips, calendar
+   * a customer project after importing this file. Points at the imToken
+   * brand ramp above. Content/data blues (charts, status chips, calendar
    * events, info notifications) deliberately keep referencing blue-*.
    * --------------------------------------------------------------------------*/
-  --color-accent-50:  var(--color-blue-50);
-  --color-accent-100: var(--color-blue-100);
-  --color-accent-200: var(--color-blue-200);
-  --color-accent-300: var(--color-blue-300);
-  --color-accent-400: var(--color-blue-400);
-  --color-accent-500: var(--color-blue-500);
-  --color-accent-600: var(--color-blue-600);
-  --color-accent-700: var(--color-blue-700);
-  --color-accent-800: var(--color-blue-800);
-  --color-accent-900: var(--color-blue-900);
-  --color-accent-950: var(--color-blue-950);
+  --color-accent-50:  var(--color-brand-50);
+  --color-accent-100: var(--color-brand-100);
+  --color-accent-200: var(--color-brand-200);
+  --color-accent-300: var(--color-brand-300);
+  --color-accent-400: var(--color-brand-400);
+  --color-accent-500: var(--color-brand-500);
+  --color-accent-600: var(--color-brand-600);
+  --color-accent-700: var(--color-brand-700);
+  --color-accent-800: var(--color-brand-800);
+  --color-accent-900: var(--color-brand-900);
+  --color-accent-950: var(--color-brand-950);
 
   /* ----- Typography ----------------------------------------------------------
    * Font sizes, weights, line-heights, and tracking all match Tailwind v4

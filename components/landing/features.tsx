@@ -154,7 +154,7 @@ function ImKeyArt() {
             <RiShieldCheckFill className="size-5 text-accent-300" aria-hidden />
             <div className="mt-1.5 h-1 w-14 rounded-full bg-white/30" />
           </div>
-          <div className="absolute right-6 top-1/2 size-12 -translate-y-1/2 rounded-full border-2 border-white/20 bg-[radial-gradient(circle,#5f92ff,#2f63d6)]" />
+          <div className="absolute right-6 top-1/2 size-12 -translate-y-1/2 rounded-full border-2 border-white/20 bg-[radial-gradient(circle,var(--color-accent-400),var(--color-accent-600))]" />
         </Tile>
         <Ghost x={40} y={60} w={200} h={130} />
         <div className="absolute rounded-full bg-iso-face px-3 py-1 text-caption-1-semibold text-text-primary shadow-sm" style={{ left: 60, top: 200, transform: "translateZ(30px)" }}>
@@ -209,30 +209,32 @@ export function Features() {
         </Reveal>
       </div>
 
-      {/* full-bleed grid: the page frame supplies the outer edges; the 1px
-          negative end margin tucks each row's last divider under that frame */}
-      <div className="mt-16 overflow-hidden border-t border-landing-frame">
-        <div className="-me-px grid grid-cols-1 bg-background-primary-default md:grid-cols-2 lg:grid-cols-6">
-          {CARDS.map((card, i) => (
-            <Reveal
-              key={card.title}
-              delay={i * 0.05}
-              className={cx(
-                "flex flex-col border-landing-frame",
-                "border-b md:border-e",
-                card.span,
-                i === CARDS.length - 1 && "md:col-span-2 lg:col-span-3",
-              )}
-            >
-              <article className="flex h-full flex-col">
-                <div className="px-6 pt-8 sm:px-8">
-                  <h3 className="font-serif text-card-serif text-landing-ink">{card.title}</h3>
-                  <p className="mt-3 max-w-[420px] text-headline-regular text-text-secondary">{card.body}</p>
-                </div>
-                <div className="mt-auto">{card.art}</div>
-              </article>
-            </Reveal>
-          ))}
+      {/* wide contained grid; the outer border draws the edges, and the 1px
+          negative end/bottom margins tuck each card's own dividers under it */}
+      <div className="mx-auto mt-16 max-w-[1320px] px-4 sm:px-6">
+        <div className="overflow-hidden border border-landing-frame">
+          <div className="-me-px -mb-px grid grid-cols-1 bg-background-primary-default md:grid-cols-2 lg:grid-cols-6">
+            {CARDS.map((card, i) => (
+              <Reveal
+                key={card.title}
+                delay={i * 0.05}
+                className={cx(
+                  "flex flex-col border-landing-frame",
+                  "border-b md:border-e",
+                  card.span,
+                  i === CARDS.length - 1 && "md:col-span-2 lg:col-span-3",
+                )}
+              >
+                <article className="flex h-full flex-col">
+                  <div className="px-6 pt-8 sm:px-8">
+                    <h3 className="font-serif text-card-serif text-landing-ink">{card.title}</h3>
+                    <p className="mt-3 max-w-[420px] text-headline-regular text-text-secondary">{card.body}</p>
+                  </div>
+                  <div className="mt-auto">{card.art}</div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </div>
     </section>

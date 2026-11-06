@@ -9,22 +9,22 @@
   --landing-frame: #e4e7ec;
   --landing-ink: #0b1533;
   --iso-face: #ffffff;
-  --iso-face-tint: #eef3ff;
-  --iso-edge: #c9d7ff;
-  --iso-edge-deep: #a9bfff;
-  --iso-line: #8fa9f5;
+  --iso-face-tint: var(--color-accent-50);
+  --iso-edge: color-mix(in oklab, var(--color-accent-200) 70%, var(--color-white));
+  --iso-edge-deep: var(--color-accent-200);
+  --iso-line: var(--color-accent-300);
   --iso-dark: #0b1533;
   --iso-dark-edge: #050b1f;
-  --iso-glow: rgba(61, 123, 255, 0.18);
-  --iso-panel-blue: #3d7bff;
+  --iso-glow: color-mix(in oklab, var(--color-accent-500) 18%, transparent);
+  --iso-panel-blue: var(--color-accent-500);
   /* hero phone + footer machine */
-  --iso-frame-from: #9cc0ff;
-  --iso-frame-to: #2f63d6;
-  --iso-frame-edge: #1d4fbf;
-  --iso-slab-from: rgba(120, 165, 255, 0.55);
-  --iso-slab-to: rgba(47, 99, 214, 0.85);
-  --iso-coin-edge: #c3d4ff;
-  --iso-coin-rim: #7d9df0;
+  --iso-frame-from: var(--color-accent-300);
+  --iso-frame-to: var(--color-accent-600);
+  --iso-frame-edge: var(--color-accent-700);
+  --iso-slab-from: color-mix(in oklab, var(--color-accent-400) 55%, transparent);
+  --iso-slab-to: color-mix(in oklab, var(--color-accent-600) 85%, transparent);
+  --iso-coin-edge: var(--color-accent-100);
+  --iso-coin-rim: var(--color-accent-400);
   --iso-body-side: #dfe7fb;
   --iso-hole: #0b1533;
 }
@@ -39,16 +39,16 @@
   --iso-face-tint: #1b2640;
   --iso-edge: #2a3a63;
   --iso-edge-deep: #1d2a4a;
-  --iso-line: #4d6bc4;
-  --iso-dark: #3d7bff;
-  --iso-dark-edge: #2353c4;
-  --iso-glow: rgba(61, 123, 255, 0.28);
-  --iso-panel-blue: #2f63d6;
-  --iso-frame-from: #5f92ff;
-  --iso-frame-to: #1f4fc0;
-  --iso-frame-edge: #163a8f;
-  --iso-slab-from: rgba(61, 123, 255, 0.25);
-  --iso-slab-to: rgba(47, 99, 214, 0.6);
+  --iso-line: var(--color-accent-600);
+  --iso-dark: var(--color-accent-500);
+  --iso-dark-edge: var(--color-accent-700);
+  --iso-glow: color-mix(in oklab, var(--color-accent-500) 28%, transparent);
+  --iso-panel-blue: var(--color-accent-600);
+  --iso-frame-from: var(--color-accent-400);
+  --iso-frame-to: var(--color-accent-700);
+  --iso-frame-edge: var(--color-accent-800);
+  --iso-slab-from: color-mix(in oklab, var(--color-accent-500) 25%, transparent);
+  --iso-slab-to: color-mix(in oklab, var(--color-accent-600) 60%, transparent);
   --iso-coin-edge: #2a3a63;
   --iso-coin-rim: #1d2a4a;
   --iso-body-side: #1b2640;
@@ -245,15 +245,15 @@
 }
 
 .iso-tile--blue {
-  background: linear-gradient(135deg, #6d9bff, #3d7bff);
-  border-color: #2f63d6;
+  background: linear-gradient(135deg, var(--color-accent-400), var(--color-accent-500));
+  border-color: var(--color-accent-600);
   box-shadow:
-    -1px 1px 0 #2f63d6,
-    -2px 2px 0 #2f63d6,
-    -3px 3px 0 #2f63d6,
-    -4px 4px 0 #2353c4,
-    -5px 5px 0 #2353c4,
-    -6px 6px 0 #1b45a8,
+    -1px 1px 0 var(--color-accent-600),
+    -2px 2px 0 var(--color-accent-600),
+    -3px 3px 0 var(--color-accent-600),
+    -4px 4px 0 var(--color-accent-700),
+    -5px 5px 0 var(--color-accent-700),
+    -6px 6px 0 var(--color-accent-800),
     -22px 22px 30px var(--iso-glow);
 }
 

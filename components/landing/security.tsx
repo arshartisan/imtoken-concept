@@ -87,7 +87,7 @@ function SupportArt() {
       </div>
       <Plane size={320} style={{ top: "55%", left: "38%" }}>
         <Tile x={60} y={150} w={110} h={130} radius="26px" float>
-          <div className="grid size-16 place-items-center rounded-full bg-[linear-gradient(135deg,#6d9bff,#3d7bff)]">
+          <div className="grid size-16 place-items-center rounded-full bg-[linear-gradient(135deg,var(--color-accent-400),var(--color-accent-500))]">
             <span className="text-title-1-semibold text-text-white">24</span>
           </div>
         </Tile>

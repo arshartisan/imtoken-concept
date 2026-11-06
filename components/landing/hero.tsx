@@ -10,7 +10,7 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex max-w-[980px] flex-col items-center px-4 pt-20 text-center sm:pt-28">
         <Reveal>
           <a
-            href="#security"
+            href="#features"
             className="mb-8 inline-flex items-center gap-2 rounded-full border border-landing-frame bg-background-primary-default/80 py-1 pr-3 pl-1 text-body-medium text-text-secondary backdrop-blur transition-colors duration-150 hover:text-text-primary"
           >
             <span className="rounded-full bg-accent-500 px-2 py-0.5 text-caption-1-semibold text-text-white">New</span>

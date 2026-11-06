@@ -264,8 +264,39 @@ function Phone({ balance }: { balance: number }) {
   );
 }
 
-/* A coin hovering above its own ground shadow; it flips every few seconds. */
-function Coin({ x, y, size, symbol, z = 120, delay = 0 }: { x: number; y: number; size: number; symbol?: TokenSymbol; z?: number; delay?: number }) {
+function CoinFace({ symbol, z, back = false }: { symbol: TokenSymbol; z: number; back?: boolean }) {
+  return (
+    <div
+      className="absolute inset-0 grid place-items-center rounded-full border-2 bg-[linear-gradient(135deg,var(--iso-frame-from),var(--iso-frame-to))] [backface-visibility:hidden]"
+      style={{ transform: `translateZ(${z}px)${back ? " rotateY(180deg)" : ""}`, borderColor: "var(--iso-coin-edge)" }}
+    >
+      <div className="grid size-[72%] place-items-center rounded-full border-2 border-text-white/50">
+        <TokenIcon symbol={symbol} className="size-[70%]" />
+      </div>
+    </div>
+  );
+}
+
+/* A coin hovering above its own ground shadow; it flips every few seconds to
+   show the token on its other face. */
+function Coin({
+  x,
+  y,
+  size,
+  front,
+  back,
+  z = 120,
+  delay = 0,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  front: TokenSymbol;
+  back: TokenSymbol;
+  z?: number;
+  delay?: number;
+}) {
+  const thickness = Math.max(10, Math.round(size / 8));
   return (
     <div className="absolute" style={{ left: x, top: y, width: size, height: size }}>
       <div
@@ -275,20 +306,9 @@ function Coin({ x, y, size, symbol, z = 120, delay = 0 }: { x: number; y: number
       <div className="absolute inset-0" style={{ transform: `translateZ(${z}px)` }}>
         <div className="iso-float absolute inset-0" style={{ animationDelay: `${delay}s` }}>
           <div className="coin-flip absolute inset-0" style={{ animationDelay: `${delay * 1.7}s` }}>
-            <Extrude layers={16} step={1} className="rounded-full" style={{ background: "var(--iso-coin-rim)" }} />
-            <div
-              className={cx(
-                "absolute inset-0 grid place-items-center rounded-full border-2",
-                symbol ? "bg-[linear-gradient(135deg,var(--iso-frame-from),var(--iso-frame-to))]" : "bg-iso-face",
-              )}
-              style={{ transform: "translateZ(16px)", borderColor: "var(--iso-coin-edge)" }}
-            >
-              {symbol ? (
-                <div className="grid size-[72%] place-items-center rounded-full border-2 border-white/50">
-                  <TokenIcon symbol={symbol} className="size-[70%]" />
-                </div>
-              ) : null}
-            </div>
+            <CoinFace symbol={back} z={-0.5} back />
+            <Extrude layers={thickness} step={1} className="rounded-full" style={{ background: "var(--iso-coin-rim)" }} />
+            <CoinFace symbol={front} z={thickness} />
           </div>
         </div>
       </div>
@@ -381,10 +401,10 @@ export function HeroScene() {
 
             <Phone balance={balance} />
 
-            <Coin x={20} y={210} size={120} symbol="ETH" z={130} />
-            <Coin x={790} y={650} size={130} symbol="BTC" z={110} delay={1.2} />
-            <Coin x={-10} y={730} size={70} z={90} delay={2.4} />
-            <Coin x={900} y={420} size={64} z={100} delay={3.1} />
+            <Coin x={20} y={210} size={120} front="ETH" back="USDT" z={130} />
+            <Coin x={790} y={650} size={130} front="BTC" back="TRX" z={110} delay={1.2} />
+            <Coin x={-10} y={730} size={70} front="SOL" back="BNB" z={90} delay={2.4} />
+            <Coin x={900} y={420} size={64} front="DOT" back="ATOM" z={100} delay={3.1} />
 
             <ActivityToast event={event} index={index} />
           </motion.div>
