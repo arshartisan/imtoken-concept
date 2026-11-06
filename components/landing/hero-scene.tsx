@@ -25,7 +25,7 @@ const S = 1000;
 /* Phone footprint on the plane (long axis runs along +x = up-right on screen). */
 type PhoneGeo = { x: number; y: number; w: number; h: number; inset: number; radius: number };
 const PHONE: PhoneGeo = { x: 190, y: 330, w: 620, h: 300, inset: 5, radius: 56 };
-/* The hero is a three-layer stack: main phone, network phone, blue base card.
+/* The hero is a two-layer stack: main phone over the network phone.
    Every layer repeats the same step — a small shift toward the viewer's
    bottom-right on the plane plus a fixed drop in Z — so edges stay parallel
    and the gaps stay even. */
@@ -36,9 +36,8 @@ const layer = (n: number): PhoneGeo => ({
   y: PHONE.y + STACK_STEP.dy * n,
 });
 const NETWORK_PHONE = layer(1);
-const BASE_CARD = layer(2);
 /* Height of each layer above the ground (added to the shared hover). */
-const LIFT = { top: 28, bottom: 28 - STACK_STEP.dz, base: 28 - STACK_STEP.dz * 2 };
+const LIFT = { top: 28, bottom: 28 - STACK_STEP.dz };
 
 /* Inside the screen we lay out a portrait UI and rotate it 90deg so its top
    points at the notch end. There, "down on screen" is local (+1, +1). */
@@ -245,58 +244,87 @@ function Phone({
   lift = 0,
   delay = 0.25,
   hoverDelay = 0,
+  pullOut,
   children,
 }: {
   geo: PhoneGeo;
   lift?: number;
   delay?: number;
   hoverDelay?: number;
+  /** Plane offset the phone slides to while hovered (or tapped), clear of the stack. */
+  pullOut?: { x: number; y: number; z: number };
   children: React.ReactNode;
 }) {
   const reduce = useReducedMotion();
+  const [out, setOut] = useState(false);
   const screenRadius = geo.radius - geo.inset;
   return (
     <div
       className="absolute"
       style={{ left: geo.x, top: geo.y, width: geo.w, height: geo.h, transform: `translateZ(${lift}px)` }}
+      onPointerEnter={pullOut ? (e) => e.pointerType === "mouse" && setOut(true) : undefined}
+      onPointerLeave={pullOut ? (e) => e.pointerType === "mouse" && setOut(false) : undefined}
     >
-      {/* entrance: the phone settles onto its slab from above */}
+      {/* Hit zones over the edges the layer above leaves exposed. They stay put
+          while the phone slides, so the pointer never "loses" it mid-motion. */}
+      {pullOut ? (
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-auto absolute inset-x-0 bottom-0 h-[120px] cursor-pointer"
+            onClick={() => setOut((v) => !v)}
+          />
+          <div
+            aria-hidden
+            className="pointer-events-auto absolute inset-y-0 left-0 w-[60px] cursor-pointer"
+            onClick={() => setOut((v) => !v)}
+          />
+        </>
+      ) : null}
+      {/* entrance: the phone drops into place from above */}
       <motion.div
         className="absolute inset-0"
         initial={reduce ? false : { z: 280, rotateZ: -10 }}
         animate={{ z: 0, rotateZ: 0 }}
         transition={{ type: "spring", stiffness: 55, damping: 15, mass: 1.1, delay }}
       >
-        <div className="phone-hover absolute inset-0" style={{ animationDelay: `${hoverDelay}s` }}>
-          {/* slim bezel */}
-          <div
-            className="absolute inset-0 border border-iso-frame-edge"
-            style={{
-              borderRadius: geo.radius,
-              background: "linear-gradient(90deg, var(--iso-frame-from), var(--iso-frame-to))",
-              boxShadow: `${depth(7, "var(--iso-frame-edge)")}, -60px 60px 80px var(--iso-glow)`,
-            }}
-          />
-          {/* travelling light on the bezel ring */}
-          <div
-            className="bezel-light absolute inset-0 opacity-80"
-            style={{ borderRadius: geo.radius, padding: geo.inset, transform: "translateZ(0.5px)" }}
-          />
-          {/* screen */}
-          <div
-            className="absolute border border-iso-edge bg-iso-face"
-            style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(1px)" }}
-          >
-            {children}
+        <motion.div
+          className={cx("absolute inset-0", pullOut && out && "pointer-events-auto cursor-pointer")}
+          animate={pullOut && out ? pullOut : { x: 0, y: 0, z: 0 }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 140, damping: 20, mass: 0.9 }}
+          onClick={pullOut && out ? () => setOut(false) : undefined}
+        >
+          <div className="phone-hover absolute inset-0" style={{ animationDelay: `${hoverDelay}s` }}>
+            {/* slim bezel */}
+            <div
+              className="absolute inset-0 border border-iso-frame-edge"
+              style={{
+                borderRadius: geo.radius,
+                background: "linear-gradient(90deg, var(--iso-frame-from), var(--iso-frame-to))",
+                boxShadow: `${depth(7, "var(--iso-frame-edge)")}, -60px 60px 80px var(--iso-glow)`,
+              }}
+            />
+            {/* travelling light on the bezel ring */}
+            <div
+              className="bezel-light absolute inset-0 opacity-80"
+              style={{ borderRadius: geo.radius, padding: geo.inset, transform: "translateZ(0.5px)" }}
+            />
+            {/* screen */}
+            <div
+              className="absolute border border-iso-edge bg-iso-face"
+              style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(1px)" }}
+            >
+              {children}
+            </div>
+            {/* glass reflection, under the raised card so it reads as the screen surface */}
+            <div
+              className="absolute overflow-hidden"
+              style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(2px)" }}
+            >
+              <div className="screen-sheen absolute inset-0" />
+            </div>
           </div>
-          {/* glass reflection, under the raised card so it reads as the screen surface */}
-          <div
-            className="absolute overflow-hidden"
-            style={{ inset: geo.inset, borderRadius: screenRadius, transform: "translateZ(2px)" }}
-          >
-            <div className="screen-sheen absolute inset-0" />
-          </div>
-        </div>
+        </motion.div>
       </motion.div>
     </div>
   );
@@ -558,34 +586,18 @@ export function HeroScene() {
             <Path size={S} d="M860 760 C 860 700, 830 660, 800 640" />
             <Path size={S} d="M110 840 C 170 800, 200 720, 250 660" faint />
 
-            {/* dashed footprint around the stack's base */}
+            {/* dashed footprint around the stack */}
             <div
               className="absolute rounded-[80px] border-[1.5px] border-dashed border-iso-line opacity-60"
-              style={{ left: BASE_CARD.x - 40, top: BASE_CARD.y - 40, width: BASE_CARD.w + 80, height: BASE_CARD.h + 80 }}
-            />
-            {/* blue base card: third layer, same footprint and radius as the phones */}
-            <div
-              className="absolute"
               style={{
-                left: BASE_CARD.x,
-                top: BASE_CARD.y,
-                width: BASE_CARD.w,
-                height: BASE_CARD.h,
-                transform: `translateZ(${LIFT.base}px)`,
+                left: NETWORK_PHONE.x - 40,
+                top: NETWORK_PHONE.y - 40,
+                width: NETWORK_PHONE.w + 80,
+                height: NETWORK_PHONE.h + 80,
               }}
-            >
-              <div
-                className="phone-hover absolute inset-0"
-                style={{
-                  animationDelay: "-1.2s",
-                  borderRadius: BASE_CARD.radius,
-                  background: "linear-gradient(90deg, var(--iso-slab-from), var(--iso-slab-to))",
-                  boxShadow: `${depth(6, "var(--iso-slab-to)")}, -50px 50px 70px var(--iso-glow)`,
-                }}
-              />
-            </div>
+            />
 
-            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6}>
+            <Phone geo={NETWORK_PHONE} lift={LIFT.bottom} delay={0.55} hoverDelay={-0.6} pullOut={{ x: 40, y: 250, z: 34 }}>
               <NetworkScreen />
             </Phone>
             <Phone geo={PHONE} lift={LIFT.top}>
