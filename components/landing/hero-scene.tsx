@@ -329,15 +329,16 @@ function Phone({
           />
         </>
       ) : null}
-      {/* Entrance: once the page has loaded, the layer rises into place from
-          below the fold (down on screen = −x, +y on the plane) and fades in.
-          It only travels across the plane — its height never changes — so the
-          stacked layers can't pass through each other. */}
+      {/* Entrance: once the page has loaded, the layer slides up into place
+          from below the hero's clipped bottom edge (down on screen = −x, +y on
+          the plane). Transform only, never opacity: opacity < 1 flattens the
+          3D subtree, which collapses each layer's height mid-animation (the
+          layers mis-sort) and then snaps back when the fade ends. */}
       <motion.div
         className="absolute inset-0"
-        initial={reduce ? false : { x: -240, y: 240, opacity: 0 }}
-        animate={ready || reduce ? { x: 0, y: 0, opacity: 1 } : undefined}
-        transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1], delay }}
+        initial={reduce ? false : { x: -700, y: 700 }}
+        animate={ready || reduce ? { x: 0, y: 0 } : undefined}
+        transition={{ duration: 1.25, ease: [0.16, 1, 0.3, 1], delay }}
       >
         <motion.div
           className={cx("absolute inset-0", pullOut && out && "pointer-events-auto cursor-pointer")}
