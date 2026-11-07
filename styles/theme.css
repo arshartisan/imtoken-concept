@@ -62,10 +62,10 @@
 
   /* ----- Typography ----------------------------------------------------------
    * Font sizes, weights, line-heights, and tracking all match Tailwind v4
-   * defaults. The only override is the family: Manrope, loaded via next/font
-   * in app/layout.tsx, which exposes --font-manrope to the document.
+   * defaults. The only override is the family: SF Pro, loaded via
+   * next/font/local in app/layout.tsx, which exposes --font-sf-pro.
    * --------------------------------------------------------------------------*/
-  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif,
+  --font-sans: var(--font-sf-pro), -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, sans-serif,
                "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
                "Noto Color Emoji";
 

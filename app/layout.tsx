@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, JetBrains_Mono, Manrope } from "next/font/google";
+import { Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { OffscreenPause } from "@/components/landing/offscreen-pause";
 import { SmoothScroll } from "@/components/landing/smooth-scroll";
 import "@/styles/globals.css";
 
-const manrope = Manrope({ variable: "--font-manrope", subsets: ["latin"] });
+// SF Pro variable font (Latin subset, wght 300–800, opsz 17–28 so the
+// browser switches between Text and Display cuts by font size automatically).
+const sfPro = localFont({
+  src: "./fonts/SF-Pro.woff2",
+  variable: "--font-sf-pro",
+  weight: "300 800",
+  display: "swap",
+});
 const mono = JetBrains_Mono({ variable: "--font-mono-source", subsets: ["latin"] });
 const instrumentSerif = Instrument_Serif({
   variable: "--font-instrument-serif",
@@ -21,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${instrumentSerif.variable} ${mono.variable} h-full bg-landing-ground antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${sfPro.variable} ${instrumentSerif.variable} ${mono.variable} h-full bg-landing-ground antialiased`} suppressHydrationWarning>
       <body className="min-h-full bg-landing-ground font-sans text-text-primary">
         <SmoothScroll>{children}</SmoothScroll>
         <OffscreenPause />
